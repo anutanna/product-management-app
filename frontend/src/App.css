@@ -57,3 +57,30 @@ body, html, #root {
 .read-the-docs {
   color: #888;
 }
+.form-container {
+  max-width: 400px;
+  margin: auto;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+form div {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+}
