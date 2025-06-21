@@ -9,12 +9,12 @@ let products = [
   { _id: '1', name: 'Sample Product', banner: 'https://via.placeholder.com/150', description: 'Test item', price: 100 },
 ];
 
-// GET all products
+
 app.get('/api/products', (req, res) => {
   res.json(products);
 });
 
-// GET one product
+
 app.get('/api/products/:id', (req, res) => {
   const product = products.find(p => p._id === req.params.id);
   if (product) {
@@ -24,14 +24,14 @@ app.get('/api/products/:id', (req, res) => {
   }
 });
 
-// POST a new product
+
 app.post('/api/products', (req, res) => {
   const newProduct = { ...req.body, _id: Date.now().toString() };
   products.push(newProduct);
   res.status(201).json(newProduct);
 });
 
-// PUT update product
+
 app.put('/api/products/:id', (req, res) => {
   const index = products.findIndex(p => p._id === req.params.id);
   if (index !== -1) {
@@ -42,7 +42,7 @@ app.put('/api/products/:id', (req, res) => {
   }
 });
 
-// DELETE a product
+
 app.delete('/api/products/:id', (req, res) => {
   const exists = products.some(p => p._id === req.params.id);
   if (exists) {

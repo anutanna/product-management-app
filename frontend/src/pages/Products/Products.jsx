@@ -7,26 +7,60 @@ import Header from '../../components/Header';
 import { useDispatch, useSelector } from 'react-redux';
 import { readProducts, createProduct } from '../../redux/actions/productActions';
 import Spinner from 'react-bootstrap/Spinner';
+import { useNavigate } from 'react-router-dom';
 
 const Products = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // Load products from Redux
+  const isLoggedIn = !!localStorage.getItem('token'); // ✅ Check token
+
+
   const { products, loading } = useSelector((state) => state.productState);
 
-  // Sample products (static)
   const sampleProducts = [
-    { id: 1, name: "Wireless Headphones", description: "Noise cancelling over-ear headphones", banner: "https://res.cloudinary.com/da3w329cx/image/upload/v1683056487/samples/landscapes/nature-mountains.jpg", price: 120 },
-    { id: 2, name: "Smart Watch", description: "Smart wearable with health tracking", banner: "https://res.cloudinary.com/da3w329cx/image/upload/v1683056500/cld-sample-5.jpg", price: 80 },
-    { id: 3, name: "Laptop", description: "14-inch Full HD display, 256GB SSD", banner: "https://res.cloudinary.com/da3w329cx/image/upload/v1683056499/cld-sample-3.jpg", price: 600 }
+    {
+      id: 1,
+      name: 'Wireless Headphones',
+      description: 'Noise cancelling over-ear headphones',
+      banner:
+        'https://res.cloudinary.com/da3w329cx/image/upload/v1683056487/samples/landscapes/nature-mountains.jpg',
+      price: 120,
+    },
+    {
+      id: 2,
+      name: 'Smart Watch',
+      description: 'Smart wearable with health tracking',
+      banner:
+        'https://res.cloudinary.com/da3w329cx/image/upload/v1683056500/cld-sample-5.jpg',
+      price: 80,
+    },
+    {
+      id: 3,
+      name: 'Laptop',
+      description: '14-inch Full HD display, 256GB SSD',
+      banner:
+        'https://res.cloudinary.com/da3w329cx/image/upload/v1683056499/cld-sample-3.jpg',
+      price: 600,
+    },
   ];
 
   useEffect(() => {
-    dispatch(readProducts());
-  }, [dispatch]);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/register'); // or navigate('/login') if using a login route
+    } else {
+      dispatch(readProducts());
+    }
+  }, [dispatch, navigate]);
 
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', banner: '', description: '', price: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    banner: '',
+    description: '',
+    price: '',
+  });
 
   const handleAddProduct = () => {
     dispatch(createProduct({ ...formData }));
@@ -38,16 +72,23 @@ const Products = () => {
     <section>
       <Header />
       <Container className="mt-4">
-        <div className="d-flex justify-content-end mb-4">
-          <Button variant="outline-primary" onClick={() => setShowModal(true)}>+ Add Product</Button>
-        </div>
+        {isLoggedIn && (
+          <div className="d-flex justify-content-end mb-4">
+            <Button variant="outline-primary" onClick={() => setShowModal(true)}>
+              + Add Product
+            </Button>
+          </div>
+        )}
 
         {loading ? (
           <div className="d-flex justify-content-center">
             <Spinner animation="border" variant="primary" />
           </div>
         ) : products.length === 0 ? (
-          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: '200px' }}
+          >
             <EmptyComponent message="We're currently out of stock!" />
           </div>
         ) : (
@@ -75,7 +116,9 @@ const Products = () => {
               type="text"
               placeholder="Enter name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
           </Form.Group>
 
@@ -85,7 +128,9 @@ const Products = () => {
               type="text"
               placeholder="Enter banner URL"
               value={formData.banner}
-              onChange={(e) => setFormData({ ...formData, banner: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, banner: e.target.value })
+              }
             />
           </Form.Group>
 
@@ -96,7 +141,9 @@ const Products = () => {
               rows={3}
               placeholder="Enter description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
             />
           </Form.Group>
 
@@ -106,7 +153,9 @@ const Products = () => {
               type="number"
               placeholder="Enter price"
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, price: e.target.value })
+              }
             />
           </Form.Group>
         </Form>
