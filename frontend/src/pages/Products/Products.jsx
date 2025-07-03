@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import ProductCard from '../../components/ProductCard';
-import ProductModal from '../../components/ProductModel'; // ✅ ensure correct filename
+import ProductModal from '../../components/ProductModel'; 
 import { EmptyComponent } from '../../components/Empty';
 import Header from '../../components/Header';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,8 @@ const Products = () => {
   const isLoggedIn = !!localStorage.getItem('token'); // ✅ Check token
 
 
-  const { products, loading } = useSelector((state) => state.productState);
+  const { products, loading } = useSelector((state) => state.products);
+
 
   const sampleProducts = [
     {

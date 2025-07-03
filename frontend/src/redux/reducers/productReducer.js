@@ -1,4 +1,3 @@
-
 import * as types from '../actionTypes';
 
 const initialState = {
@@ -7,7 +6,7 @@ const initialState = {
   error: null,
 };
 
-export const productReducer = (state = initialState, action) => {
+const productReducer = (state = initialState, action) => {
   switch (action.type) {
     case types.READ_PRODUCTS_REQUEST:
     case types.CREATE_PRODUCT_REQUEST:
@@ -47,3 +46,5 @@ export const productReducer = (state = initialState, action) => {
       return state;
   }
 };
+
+export default productReducer;

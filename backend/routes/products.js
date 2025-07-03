@@ -1,50 +1,60 @@
 const express = require('express');
 const router = express.Router();
-const { Product } = require('../models'); // adjust path as needed
-const { Op } = require('sequelize');
-const jwt = require('jsonwebtoken');
+const Product = require('../models/Product'); // Mongoose Product model
+const auth = require('../middleware/authMiddleware');
 
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'No token provided' });
-
+// GET all products (protected)
+router.get("/", auth, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-};
-
-router.get('/', authMiddleware, async (req, res) => {
-  try {
-    const { page = 1, limit = 10, sort, keyword } = req.query;
-    const offset = (page - 1) * limit;
-
-    const where = keyword
-      ? {
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${keyword}%` } },
-            { description: { [Op.iLike]: `%${keyword}%` } },
-          ],
-        }
-      : {};
-
-    const order = sort
-      ? [[sort.replace('-', ''), sort.startsWith('-') ? 'DESC' : 'ASC']]
-      : [];
-
-    const products = await Product.findAll({
-      where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      order,
-    });
-
+    const products = await Product.find();
     res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch products" });
+  }
+});
+
+// GET single product by ID
+router.get("/:id", auth, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch product" });
+  }
+});
+
+// CREATE product
+router.post("/", auth, async (req, res) => {
+  try {
+    const { name, banner, description, price } = req.body;
+    const newProduct = new Product({ name, banner, description, price });
+    const savedProduct = await newProduct.save();
+    res.status(201).json(savedProduct);
+  } catch (err) {
+    res.status(400).json({ message: "Failed to create product" });
+  }
+});
+
+// UPDATE product
+router.put("/:id", auth, async (req, res) => {
+  try {
+    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: "Product not found" });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: "Failed to update product" });
+  }
+});
+
+// DELETE product
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const deleted = await Product.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: "Product not found" });
+    res.json({ message: "Product deleted", id: req.params.id });
+  } catch (err) {
+    res.status(400).json({ message: "Failed to delete product" });
   }
 });
 

@@ -1,56 +1,19 @@
-import express from 'express';
-import cors from 'cors';
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./backend/config/db");
+const authRoutes = require("./backend/routes/auth");
+const productRoutes = require("./backend/routes/products");
+require("dotenv").config();
 
 const app = express();
+
+connectDB(); 
+
 app.use(cors());
 app.use(express.json());
 
-let products = [
-  { _id: '1', name: 'Sample Product', banner: 'https://via.placeholder.com/150', description: 'Test item', price: 100 },
-];
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
 
-
-app.get('/api/products', (req, res) => {
-  res.json(products);
-});
-
-
-app.get('/api/products/:id', (req, res) => {
-  const product = products.find(p => p._id === req.params.id);
-  if (product) {
-    res.status(200).json(product);
-  } else {
-    res.status(404).json({ message: 'Product not found' });
-  }
-});
-
-
-app.post('/api/products', (req, res) => {
-  const newProduct = { ...req.body, _id: Date.now().toString() };
-  products.push(newProduct);
-  res.status(201).json(newProduct);
-});
-
-
-app.put('/api/products/:id', (req, res) => {
-  const index = products.findIndex(p => p._id === req.params.id);
-  if (index !== -1) {
-    products[index] = { ...products[index], ...req.body };
-    res.status(200).json({ message: 'Product updated' });
-  } else {
-    res.status(404).json({ message: 'Product not found' });
-  }
-});
-
-
-app.delete('/api/products/:id', (req, res) => {
-  const exists = products.some(p => p._id === req.params.id);
-  if (exists) {
-    products = products.filter(p => p._id !== req.params.id);
-    res.status(200).json({ message: 'Product deleted' });
-  } else {
-    res.status(404).json({ message: 'Product not found' });
-  }
-});
-
-app.listen(5000, () => console.log('Server running on port 5000'));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
