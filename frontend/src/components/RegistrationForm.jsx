@@ -1,13 +1,11 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 
 const validationSchema = Yup.object({
-  fullName: Yup.string().required('Full Name is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
-  phone: Yup.string()
-    .matches(/^\d{10,15}$/, 'Phone must be 10 to 15 digits only')
-    .required('Phone is required'),
   password: Yup.string()
     .min(6, 'Password must be at least 6 characters')
     .required('Password is required'),
@@ -17,37 +15,40 @@ const validationSchema = Yup.object({
 });
 
 export default function RegistrationForm() {
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
-      fullName: '',
       email: '',
-      phone: '',
       password: '',
       confirmPassword: '',
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
-      alert('Registration Successful!');
+    onSubmit: async (values, { setSubmitting, setErrors }) => {
+      try {
+        const { email, password } = values;
+
+        const response = await axios.post("http://localhost:5000/api/auth/register", {
+          email,
+          password,
+        });
+
+        localStorage.setItem("token", response.data.token);
+        alert("Registration successful!");
+        navigate("/products");
+      } catch (error) {
+        console.error(error);
+        setErrors({ email: error.response?.data?.message || "Registration failed" });
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
   return (
     <div className="form-container">
-      <h2>Registration Form</h2>
+      <h2>Register</h2>
       <form onSubmit={formik.handleSubmit}>
-        <div>
-          <label>Full Name</label>
-          <input
-            name="fullName"
-            onChange={formik.handleChange}
-            value={formik.values.fullName}
-          />
-          {formik.touched.fullName && formik.errors.fullName && (
-            <div className="error">{formik.errors.fullName}</div>
-          )}
-        </div>
-
         <div>
           <label>Email</label>
           <input
@@ -58,18 +59,6 @@ export default function RegistrationForm() {
           />
           {formik.touched.email && formik.errors.email && (
             <div className="error">{formik.errors.email}</div>
-          )}
-        </div>
-
-        <div>
-          <label>Phone</label>
-          <input
-            name="phone"
-            onChange={formik.handleChange}
-            value={formik.values.phone}
-          />
-          {formik.touched.phone && formik.errors.phone && (
-            <div className="error">{formik.errors.phone}</div>
           )}
         </div>
 
@@ -99,7 +88,9 @@ export default function RegistrationForm() {
           )}
         </div>
 
-        <button type="submit">Register</button>
+        <button type="submit" disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? "Registering..." : "Register"}
+        </button>
       </form>
     </div>
   );

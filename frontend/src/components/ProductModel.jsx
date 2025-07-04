@@ -7,7 +7,7 @@ const ProductModal = ({
   onSubmit,
   title,
   children,
-  submitLabel = "Save"
+  submitLabel = "Save",
 }) => {
   return (
     <Modal show={show} onHide={onClose}>
@@ -16,7 +16,7 @@ const ProductModal = ({
       </Modal.Header>
       <Modal.Body>{children}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>Close</Button>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
         <Button variant="primary" onClick={onSubmit}>{submitLabel}</Button>
       </Modal.Footer>
     </Modal>

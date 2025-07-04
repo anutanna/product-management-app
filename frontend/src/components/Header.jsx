@@ -2,15 +2,19 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const isLoggedIn = !!localStorage.getItem('token');
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/register'; // or redirect to login
-  };
+const navigate = useNavigate();
+
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  navigate('/login'); // better than window.location.href
+};
+
+
 
   return (
     <Navbar bg="light" expand="lg">

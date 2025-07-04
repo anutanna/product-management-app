@@ -4,27 +4,33 @@ import Home from './pages/Home/Home';
 import Contact from './pages/Contact/Contact';
 import Products from './pages/Products/Products';
 import Register from './pages/Auth/Register'; 
-
-
+import Login from './pages/Auth/Login'; 
+import PrivateRoute from './pages/Products/PrivateRoute';
+import Header from './components/Header';
 import "bootstrap/dist/css/bootstrap.min.css";
-import Button from 'react-bootstrap/Button';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
-
   return (
-    <>
-     <Router>
-        <Routes>
-         <Route path="/" element={<Home />}/>
-          <Route path="/products" element={<Products />}/>
-          <Route path="/contact" element={<Contact />}/>
-          <Route path="/register" element={<Register />} />
+    <Router>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} />
 
-        </Routes>
-     </Router>
-    </>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} /> 
+
+        <Route path="/products" element={
+          <PrivateRoute>
+            <Products />
+          </PrivateRoute>
+        } />
+      </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
+    </Router>
   )
 }
 
-export default App
+export default App;

@@ -1,10 +1,10 @@
-
 import * as types from '../actionTypes';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const API = 'http://localhost:5000/api/products'; 
+const API = 'http://localhost:5000/api/products';
 
+// READ PRODUCTS
 export const readProducts = ({ page = 1, limit = 10, sort, keyword } = {}) => async (dispatch) => {
   dispatch({ type: types.READ_PRODUCTS_REQUEST });
   try {
@@ -12,10 +12,8 @@ export const readProducts = ({ page = 1, limit = 10, sort, keyword } = {}) => as
 
     const query = new URLSearchParams({ page, limit, sort, keyword }).toString();
 
-    const res = await axios.get(`http://localhost:5000/api/products?${query}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await axios.get(`${API}?${query}`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     dispatch({ type: types.READ_PRODUCTS_SUCCESS, payload: res.data });
@@ -25,17 +23,14 @@ export const readProducts = ({ page = 1, limit = 10, sort, keyword } = {}) => as
   }
 };
 
-
-
+// CREATE PRODUCT
 export const createProduct = (product) => async (dispatch) => {
   dispatch({ type: types.CREATE_PRODUCT_REQUEST });
   try {
     const token = localStorage.getItem('token');
 
     const res = await axios.post(API, product, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     dispatch({ type: types.CREATE_PRODUCT_SUCCESS, payload: res.data });
@@ -46,16 +41,35 @@ export const createProduct = (product) => async (dispatch) => {
   }
 };
 
+// UPDATE PRODUCT
+export const updateProduct = (id, productData) => async (dispatch) => {
+  dispatch({ type: types.UPDATE_PRODUCT_REQUEST });
+  try {
+    const token = localStorage.getItem('token');
 
+    const res = await axios.put(`${API}/${id}`, productData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    dispatch({ type: types.UPDATE_PRODUCT_SUCCESS, payload: res.data });
+    toast.success("Product updated!");
+  } catch (err) {
+    dispatch({
+      type: types.UPDATE_PRODUCT_FAILURE,
+      payload: err.response?.data?.message || err.message,
+    });
+    toast.error("Update failed");
+  }
+};
+
+// DELETE PRODUCT
 export const deleteProduct = (id) => async (dispatch) => {
   dispatch({ type: types.DELETE_PRODUCT_REQUEST });
   try {
     const token = localStorage.getItem('token');
 
     await axios.delete(`${API}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     dispatch({ type: types.DELETE_PRODUCT_SUCCESS, payload: id });
@@ -65,6 +79,3 @@ export const deleteProduct = (id) => async (dispatch) => {
     toast.error("Delete failed");
   }
 };
-
-
-

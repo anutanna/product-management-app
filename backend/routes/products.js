@@ -1,7 +1,8 @@
-const express = require('express');
+import express from "express";
+import Product from "../models/Product.js"; 
+import auth from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-const Product = require('../models/Product'); // Mongoose Product model
-const auth = require('../middleware/authMiddleware');
 
 // GET all products (protected)
 router.get("/", auth, async (req, res) => {
@@ -58,4 +59,4 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

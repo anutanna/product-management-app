@@ -5,7 +5,7 @@ import ProductModal from '../../components/ProductModel';
 import { EmptyComponent } from '../../components/Empty';
 import Header from '../../components/Header';
 import { useDispatch, useSelector } from 'react-redux';
-import { readProducts, createProduct } from '../../redux/actions/productActions';
+import { readProducts, createProduct, updateProduct } from '../../redux/actions/productActions';
 import Spinner from 'react-bootstrap/Spinner';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,49 +13,10 @@ const Products = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isLoggedIn = !!localStorage.getItem('token'); // ✅ Check token
-
-
-  const { products, loading } = useSelector((state) => state.products);
-
-
-  const sampleProducts = [
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      description: 'Noise cancelling over-ear headphones',
-      banner:
-        'https://res.cloudinary.com/da3w329cx/image/upload/v1683056487/samples/landscapes/nature-mountains.jpg',
-      price: 120,
-    },
-    {
-      id: 2,
-      name: 'Smart Watch',
-      description: 'Smart wearable with health tracking',
-      banner:
-        'https://res.cloudinary.com/da3w329cx/image/upload/v1683056500/cld-sample-5.jpg',
-      price: 80,
-    },
-    {
-      id: 3,
-      name: 'Laptop',
-      description: '14-inch Full HD display, 256GB SSD',
-      banner:
-        'https://res.cloudinary.com/da3w329cx/image/upload/v1683056499/cld-sample-3.jpg',
-      price: 600,
-    },
-  ];
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/register'); // or navigate('/login') if using a login route
-    } else {
-      dispatch(readProducts());
-    }
-  }, [dispatch, navigate]);
+  const { products, loading, error } = useSelector((state) => state.products);
 
   const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     banner: '',
@@ -63,23 +24,46 @@ const Products = () => {
     price: '',
   });
 
-  const handleAddProduct = () => {
-    dispatch(createProduct({ ...formData }));
+  const handleEditProduct = (product) => {
+    setFormData({
+      name: product.name,
+      banner: product.banner,
+      description: product.description,
+      price: product.price,
+    });
+    setEditingProduct(product);
+    setShowModal(true);
+  };
+
+  const handleAddOrUpdateProduct = () => {
+    if (editingProduct) {
+      dispatch(updateProduct(editingProduct._id, formData));
+    } else {
+      dispatch(createProduct(formData));
+    }
     setFormData({ name: '', banner: '', description: '', price: '' });
+    setEditingProduct(null);
     setShowModal(false);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login'); // redirect if not logged in
+    } else {
+      dispatch(readProducts());
+    }
+  }, [dispatch, navigate]);
 
   return (
     <section>
       <Header />
       <Container className="mt-4">
-        {isLoggedIn && (
-          <div className="d-flex justify-content-end mb-4">
-            <Button variant="outline-primary" onClick={() => setShowModal(true)}>
-              + Add Product
-            </Button>
-          </div>
-        )}
+        <div className="d-flex justify-content-end mb-4">
+          <Button variant="outline-primary" onClick={() => setShowModal(true)}>
+            + Add Product
+          </Button>
+        </div>
 
         {loading ? (
           <div className="d-flex justify-content-center">
@@ -94,21 +78,31 @@ const Products = () => {
           </div>
         ) : (
           <Row className="g-4">
-            {[...sampleProducts, ...products].map((product) => (
-              <Col key={product.id} xs={12} sm={6} lg={3}>
-                <ProductCard product={product} />
+            {products.map((product) => (
+              <Col key={product._id} xs={12} sm={6} lg={3}>
+                <ProductCard
+                  product={product}
+                  onEdit={() => handleEditProduct(product)}
+                />
               </Col>
             ))}
           </Row>
+        )}
+
+        {error && (
+          <div className="alert alert-danger text-center mt-3">{error}</div>
         )}
       </Container>
 
       <ProductModal
         show={showModal}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleAddProduct}
-        title="Add New Product"
-        submitLabel="Add"
+        onClose={() => {
+          setShowModal(false);
+          setEditingProduct(null);
+        }}
+        onSubmit={handleAddOrUpdateProduct}
+        title={editingProduct ? "Edit Product" : "Add New Product"}
+        submitLabel={editingProduct ? "Update" : "Add"}
       >
         <Form>
           <Form.Group className="mb-3">
