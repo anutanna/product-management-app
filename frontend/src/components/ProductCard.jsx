@@ -2,7 +2,8 @@ import React from 'react';
 import { Card } from 'react-bootstrap';
 import { Pencil, Trash } from 'lucide-react';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onEdit, onDelete }) => {
+
   return (
     <Card style={{ width: '100%', minHeight: '400px' }}>
       <Card.Img
@@ -16,9 +17,19 @@ const ProductCard = ({ product }) => {
         <Card.Text>{product.description}</Card.Text>
         <h5 className="text-primary">${product.price}</h5>
         <div className="d-flex justify-content-end gap-2 mt-3">
-          <Pencil size={16} style={{ cursor: 'pointer' }} />
-          <Trash size={16} color="red" style={{ cursor: 'pointer' }} />
-        </div>
+  <Pencil
+    size={16}
+    style={{ cursor: 'pointer' }}
+    onClick={onEdit}
+  />
+  <Trash
+    size={16}
+    color="red"
+    style={{ cursor: 'pointer' }}
+    onClick={onDelete}
+  />
+</div>
+
       </Card.Body>
     </Card>
   );

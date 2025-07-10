@@ -3,9 +3,8 @@ import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import ProductCard from '../../components/ProductCard';
 import ProductModal from '../../components/ProductModel'; 
 import { EmptyComponent } from '../../components/Empty';
-import Header from '../../components/Header';
 import { useDispatch, useSelector } from 'react-redux';
-import { readProducts, createProduct, updateProduct } from '../../redux/actions/productActions';
+import { readProducts, createProduct, updateProduct, deleteProduct } from '../../redux/actions/productActions';
 import Spinner from 'react-bootstrap/Spinner';
 import { useNavigate } from 'react-router-dom';
 
@@ -57,7 +56,7 @@ const Products = () => {
 
   return (
     <section>
-      <Header />
+
       <Container className="mt-4">
         <div className="d-flex justify-content-end mb-4">
           <Button variant="outline-primary" onClick={() => setShowModal(true)}>
@@ -81,9 +80,11 @@ const Products = () => {
             {products.map((product) => (
               <Col key={product._id} xs={12} sm={6} lg={3}>
                 <ProductCard
-                  product={product}
-                  onEdit={() => handleEditProduct(product)}
-                />
+  product={product}
+  onEdit={() => handleEditProduct(product)}
+  onDelete={() => dispatch(deleteProduct(product._id))}
+/>
+
               </Col>
             ))}
           </Row>
