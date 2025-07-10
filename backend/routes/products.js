@@ -3,7 +3,16 @@ import Product from "../models/Product.js";
 import auth from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Get all products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: A list of products
+ */
 // GET all products (protected)
 router.get("/", auth, async (req, res) => {
   try {
