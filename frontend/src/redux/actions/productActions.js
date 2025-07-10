@@ -2,7 +2,7 @@ import * as types from '../actionTypes';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const API = 'http://localhost:5000/api/products';
+const API = 'https://product-management-app-ejwr.onrender.com/api/products';
 
 // READ PRODUCTS
 export const readProducts = ({ page = 1, limit = 10, sort, keyword } = {}) => async (dispatch) => {
